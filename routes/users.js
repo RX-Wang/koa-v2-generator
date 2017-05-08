@@ -21,7 +21,8 @@ router.use(['/login'],middle);
 
 router.get('/',userController.index);
 router.get('/login',userController.login);
-router.all('/sign-up',userController.signUp);
+router.get('/register',userController.register);
+router.post('/sign-up',userController.signUp);
 router.get('/html',userController.html);
 router.post('/download',userController.download);
 

@@ -4,9 +4,11 @@
 const send      = require('koa-send');
 const sendfile  = require('koa-sendfile');
 const Promise   = require('bluebird');
+const userModel = require('../model/user');
+const dao       = require('../dao');
 const fs        = require('fs');
-const path  = require('path');
-const Users = {};
+const path      = require('path');
+const Users     = {};
 
 Users.index = (ctx)=>{
     // console.log('users-----');
@@ -18,30 +20,47 @@ Users.login = (ctx)=>{
   ctx.body = 'users/login'
 };
 
-Users.signUp = (ctx)=>{
-    const req = ctx.request;
-    const uname = req.query.uname || req.body.uname;
-    const password = req.query.password || req.body.password;
-    // console.log('uname:%s--password:%s',uname,password);
-    if(!uname || !password){
-        // ctx.response.status = 500;
+Users.register =async (ctx)=>{
+    await ctx.render('/register');
+};
+
+Users.signUp = async (ctx)=>{
+    const req   = ctx.request;
+    const name  = req.query.name || req.body.name || '';
+    const pwd   = req.query.pwd || req.body.pwd || '';
+    if(!name || !pwd){
         ctx.body = {
             code : 'ERROR',
             msg  : '参数错误'
         };
     }else{
-        ctx.body = {
-            code : 'success',
-            msg  : '成功'
-        };
+        const result = await new Promise(function (reso,rej) {
+            dao.save(userModel,{
+                name : name,
+                pwd  : pwd
+            },function (err,data) {
+                if(err)
+                    return reso(err.message);
+                return reso(data);
+            });
+        });
+        if(typeof result == 'string'){
+            console.log(result);
+            return ctx.body = {
+                code : 'faild',
+                msg  : '注册失败'
+            };
+        }else{
+            return ctx.body = {
+                code : '200',
+                msg  : '注册成功'
+            };
+        }
     }
 };
 
 Users.html = async (ctx,next)=>{
     await ctx.render('img',{data:'李若彤'});     //将img.html渲染到index.html 根视图中。
-    // return next().then(() => {
-    //     ctx.render('index',{data:'李若彤'});
-    // });
 };
 
 Users.download = async (ctx)=>{
