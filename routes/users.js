@@ -25,6 +25,10 @@ router.get('/register',userController.register);
 router.post('/sign-up',userController.signUp);
 router.get('/html',userController.html);
 router.post('/download',userController.download);
+router.get('/redisSet',userController.redisSet);
+router.get('/redisGet',userController.redisGet);
+
+
 
 module.exports = router;
 

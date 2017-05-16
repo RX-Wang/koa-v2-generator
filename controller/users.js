@@ -8,6 +8,7 @@ const userModel = require('../model/user');
 const dao       = require('../dao');
 const fs        = require('fs');
 const path      = require('path');
+const config    = require('../config');
 const Users     = {};
 
 Users.index = (ctx)=>{
@@ -77,6 +78,50 @@ Users.download = async (ctx)=>{
     ctx.body = {
         downloadPath : p
     };
+};
+
+/**
+ * redis 设置某个值
+ * @param ctx
+ */
+Users.redisSet = async (ctx) =>{
+// listen for redis connection error event
+    config.redisCache.store.events.on('redisError', function(error) {
+        // handle error here
+        console.log('redis===报错了%j' , error);
+    });
+    try{
+        const resu = await new Promise(function (reso,rej) {
+            config.redisCache.set('myLove', "Diana", { ttl: 20 }, function(err) {
+                if (err) {
+                    rej(err);
+                }else {
+                    reso('设置成功');
+                }
+            });
+        });
+        return ctx.body = resu;
+    }catch(e){
+        return ctx.body = e;
+    }
+
+
+};
+
+
+/**
+ * redis 获取某个值
+ * @param ctx
+ */
+Users.redisGet = async (ctx) =>{
+    const resu = await new Promise(function (reso,rej) {
+        config.redisCache.get('myLove', function(err, result) {
+            console.log(result);
+            // redisCache.del('foo', function(err) {});
+            reso(result);
+        });
+    });
+    return ctx.body = resu || '没有';
 };
 
 
