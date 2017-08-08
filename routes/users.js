@@ -27,6 +27,7 @@ router.get('/html',userController.html);
 router.post('/download',userController.download);
 router.get('/redisSet',userController.redisSet);
 router.get('/redisGet',userController.redisGet);
+router.get('/socket',userController.user_socket);
 
 
 

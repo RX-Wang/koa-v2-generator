@@ -124,5 +124,8 @@ Users.redisGet = async (ctx) =>{
     return ctx.body = resu || '没有';
 };
 
+Users.user_socket = async(ctx)=>{
+  await ctx.render('socket');
+};
 
 module.exports = Users;
