@@ -5,6 +5,9 @@ const send      = require('koa-send');
 const sendfile  = require('koa-sendfile');
 const Promise   = require('bluebird');
 const userModel = require('../model/user');
+const test01Model = require('../model/test01');
+const test02Model = require('../model/test02');
+const test03Model = require('../model/test03');
 const dao       = require('../dao');
 const fs        = require('fs');
 const path      = require('path');
@@ -126,6 +129,138 @@ Users.redisGet = async (ctx) =>{
 
 Users.user_socket = async(ctx)=>{
   await ctx.render('socket');
+};
+
+Users.saveForFor = async(ctx) =>{
+    for(let i = 1; i <= 4; i++){
+        const saved = await new Promise(function (reso,rej) {
+            dao.save(test01Model,{name : `用户:${i}`},function (err,saved01) {
+                if(err)
+                    return rej(err);
+                reso(saved01);
+            });
+        }).then(function (saved01) {
+            for(let j = 1; j <= 4; j++){
+                dao.save(test02Model,{
+                    uid     : saved01._id,
+                    patient : `用户:${i}--患者:${j}`
+                },function (err,saved02) {
+                    if(err)
+                        return console.log(err.message);
+                    else{
+                        for(let k = 1; k <=4; k++){
+                            dao.save(test03Model,{
+                                patientId   : saved02._id,
+                                medicalCard :  `用户:${i}--患者:${j}--就诊卡:${k}`
+                            },function (err,saved03) {
+                                if(err)
+                                    console.log(err.message);
+                                else
+                                    console.log(saved03);
+                                if(k == 4)
+                                    return Promise.resolve();
+                            })
+                        }
+                    }
+                })
+            }
+        }).catch(function (err) {
+            console.log(err.message);
+        });
+        if(i == 4)
+            return ctx.body = 'SUCCESS';
+    }
+};
+
+Users.findUserForFor = async(ctx)=>{
+    const users = await new Promise(function (reso,rej) {
+        dao.find(test01Model,{},function (err,users) {
+            if(err)
+                return rej(err);
+            reso(users);
+        })
+    });
+    const u3 = await new Promise(function (reso1,rej1) {
+        async function doSth(count) {
+            const patients = await new Promise(function (reso,rej) {
+                dao.find(test02Model,{uid : users[count]._id},function (err,patients) {
+                    reso(patients);
+                })
+            });
+            const u2 = await new Promise(function (resolve,reject) {
+                async function doSth01(num){
+                    const u1 = await new Promise(function (reso,rej) {
+                        dao.find(test03Model,{patientId : patients[num]._id},function (err,medicalCard) {
+                            patients[num]._doc.medicalCard = medicalCard;
+                            num++;
+                            if(num < 4)
+                                return doSth01(num);
+                            else{
+                                users[count].patient = patients;
+                                count++;
+                                if(count < 4)
+                                    return doSth(count);
+                                else{
+                                    console.log(users);
+                                    //return ctx.body = users;
+                                    reso(users);
+                                }
+                            }
+                        })
+                    });
+                    if(num == 4)
+                        return resolve(u1);
+                }
+                doSth01(0);
+            });
+            if(count == 4)
+                reso1(u2);
+        }
+        doSth(0);
+    });
+    return ctx.body = u3;
+    /*new Promise(function (reso,rej) {
+        dao.find(test01Model,{},function (err,users) {
+            if(err)
+                return rej(err);
+            reso(users);
+        })
+    }).then(function (users) {
+        function doSth(count) {
+            new Promise(function (reso,rej) {
+                dao.find(test02Model,{uid : users[count]._id},function (err,patients) {
+                    reso(patients);
+                })
+            }).then(function (patients) {
+                function doSth01(num){
+                    return new Promise(function (reso,rej) {
+                        dao.find(test03Model,{patientId : patients[num]._id},function (err,medicalCard) {
+                            patients[num]._doc.medicalCard = medicalCard;
+                            num++;
+                            if(num < 4)
+                                return doSth01(num);
+                            else{
+                                users[count].patient = patients;
+                                count++;
+                                if(count < 4)
+                                    return doSth(count);
+                                else{
+                                    console.log(users);
+                                    //return ctx.body = users;
+                                    return users;
+                                }
+                            }
+                        })
+                    });
+                }
+                doSth01(0);
+            });
+        }
+        doSth(0);
+    }).catch(function (err) {
+        console.log(err.message);
+    });*/
+
 };
 
 module.exports = Users;

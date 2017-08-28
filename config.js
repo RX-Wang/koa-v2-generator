@@ -1,9 +1,11 @@
 /**
  * Created by wangxuquan on 2017/5/8.
  */
-const cacheManager = require('cache-manager');
-const redisStore = require('cache-manager-redis');
-module.exports = {
+const cacheManager  = require('cache-manager');
+const redisStore    = require('cache-manager-redis');
+const mongoose      = require('mongoose');
+mongoose.Promise    = global.Promise;
+const config = module.exports = {
     mongo       : {
         "hostname": "127.0.0.1",
         "port"    : 27017,
@@ -19,6 +21,7 @@ module.exports = {
             return "mongodb://" + this.mongo.hostname + ":" + this.mongo.port + "/" + this.mongo.db;
         }
     },
+
     /**
      * redis 缓存
      */
@@ -31,3 +34,10 @@ module.exports = {
         ttl: 600    //缓存时间
     })
 };
+
+mongoose.connect(config.connection(),function (err,data) {
+    if(err)
+        console.error('链接失败：%s',err.message);
+    else
+        console.info('链接成功：%s',config.connection());
+});
