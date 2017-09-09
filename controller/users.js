@@ -173,52 +173,63 @@ Users.saveForFor = async(ctx) =>{
 };
 
 Users.findUserForFor = async(ctx)=>{
-    const users = await new Promise(function (reso,rej) {
-        dao.find(test01Model,{},function (err,users) {
-            if(err)
-                return rej(err);
-            reso(users);
-        })
-    });
-    const u3 = await new Promise(function (reso1,rej1) {
-        async function doSth(count) {
-            const patients = await new Promise(function (reso,rej) {
-                dao.find(test02Model,{uid : users[count]._id},function (err,patients) {
-                    reso(patients);
-                })
-            });
-            const u2 = await new Promise(function (resolve,reject) {
-                async function doSth01(num){
-                    const u1 = await new Promise(function (reso,rej) {
-                        dao.find(test03Model,{patientId : patients[num]._id},function (err,medicalCard) {
-                            patients[num]._doc.medicalCard = medicalCard;
-                            num++;
-                            if(num < 4)
-                                return doSth01(num);
-                            else{
-                                users[count].patient = patients;
-                                count++;
-                                if(count < 4)
-                                    return doSth(count);
+    try{
+        const users = await new Promise(function (reso,rej) {
+            dao.find(test01Model,{},function (err,users) {
+                //users && users.length && console.log(users);
+                if(err)
+                    return rej(err);
+                reso(users);
+            })
+        });
+        const u3 = await new Promise(function (reso1,rej1) {
+            async function doSth(count) {
+                const patients = await new Promise(function (reso,rej) {
+                    dao.find(test02Model,{uid : users[count] ? users[count]._id : '123'},function (err,patients) {
+                        reso(patients);
+                    })
+                }).catch(function (err) {
+                    rej1(err);
+                });
+                const u2 = await new Promise(function (resolve,reject) {
+                    async function doSth01(num){
+                        const u1 = await new Promise(function (reso,rej) {
+                            dao.find(test03Model,{patientId : patients[num]._id},function (err,medicalCard) {
+                                patients[num]._doc.medicalCard = medicalCard;
+                                num++;
+                                if(num < 4)
+                                    return doSth01(num);
                                 else{
-                                    console.log(users);
-                                    //return ctx.body = users;
-                                    reso(users);
+                                    users[count].patient = patients;
+                                    count++;
+                                    if(count < 4)
+                                        return doSth(count);
+                                    else{
+                                        //console.log(users);
+                                        //return ctx.body = users;
+                                        reso(users);
+                                    }
                                 }
-                            }
-                        })
-                    });
-                    if(num == 4)
-                        return resolve(u1);
-                }
-                doSth01(0);
-            });
-            if(count == 4)
-                reso1(u2);
+                            })
+                        });
+                        if(num == 4)
+                            return resolve(u1);
+                    }
+                    doSth01(0);
+                });
+                if(count == 4)
+                    reso1(u2);
+            }
+            doSth(0);
+        });
+        return ctx.body = u3;
+    }catch (e){
+        console.log(e);
+        return ctx.body = {
+            errMsg : e.message
         }
-        doSth(0);
-    });
-    return ctx.body = u3;
+    }
+
     /*new Promise(function (reso,rej) {
         dao.find(test01Model,{},function (err,users) {
             if(err)

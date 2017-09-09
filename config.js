@@ -35,7 +35,9 @@ const config = module.exports = {
     })
 };
 
-mongoose.connect(config.connection(),function (err,data) {
+mongoose.connect(config.connection(),{
+    useMongoClient: true
+},function (err,data) {
     if(err)
         console.error('链接失败：%s',err.message);
     else
