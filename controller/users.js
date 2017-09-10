@@ -70,14 +70,16 @@ Users.html = async (ctx,next)=>{
 Users.download = async (ctx)=>{
     const req      = ctx.request;
     const  p       = req.query.fileName || req.body.fileName || 'unkonw';
+    console.log(`p---${p}`);
     //取文件名
     const start = p.lastIndexOf('/');
+    console.log(`start:${start}`);
     const filename = p.substring(~~start+1);
-    console.log('文件名称---' + filename);
+    console.log(`文件名称---${filename}`);
 
     //取真实文件路径
     const filepath = path.join(__dirname,'../public/',p);
-    console.log('文件路径---' + filepath);
+    console.log(`文件路径---${filepath}` );
     ctx.body = {
         downloadPath : p
     };
@@ -272,6 +274,12 @@ Users.findUserForFor = async(ctx)=>{
         console.log(err.message);
     });*/
 
+};
+
+Users.readHtmlFile = async(ctx)=>{
+    console.log(ctx.request.accept.headers.accept);
+    ctx.response.type = 'html';
+    ctx.response.body = fs.readFileSync(path.join(__dirname,'../views/readHtmlFile.html'));
 };
 
 module.exports = Users;
