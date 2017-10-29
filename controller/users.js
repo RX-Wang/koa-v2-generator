@@ -1,18 +1,18 @@
 /**
  * Created by wangxuquan on 2017/5/4.
  */
-const send      = require('koa-send');
-const sendfile  = require('koa-sendfile');
-const Promise   = require('bluebird');
-const userModel = require('../model/user');
-const test01Model = require('../model/test01');
-const test02Model = require('../model/test02');
-const test03Model = require('../model/test03');
-const dao       = require('../dao');
-const fs        = require('fs');
-const path      = require('path');
-const config    = require('../config');
-const Users     = {};
+const send          = require('koa-send');
+const sendfile      = require('koa-sendfile');
+const Promise       = require('bluebird');
+const userModel     = require('../model/user');
+const test01Model   = require('../model/test01');
+const test02Model   = require('../model/test02');
+const test03Model   = require('../model/test03');
+const dao           = require('../dao');
+const fs            = require('fs');
+const path          = require('path');
+const config        = require('../config');
+const Users         = {};
 
 Users.index = (ctx)=>{
     // console.log('users-----');
@@ -24,10 +24,16 @@ Users.login = (ctx)=>{
   ctx.body = 'users/login'
 };
 
+/**
+ * 注册页面
+ */
 Users.register =async (ctx)=>{
     await ctx.render('/register');
 };
 
+/**
+ * 保存用户信息
+ */
 Users.signUp = async (ctx)=>{
     const req   = ctx.request;
     const name  = req.query.name || req.body.name || '';
@@ -48,7 +54,7 @@ Users.signUp = async (ctx)=>{
                 return reso(data);
             });
         });
-        if(typeof result == 'string'){
+        if(typeof result === 'string'){
             console.log(result);
             return ctx.body = {
                 code : 'faild',
@@ -62,6 +68,8 @@ Users.signUp = async (ctx)=>{
         }
     }
 };
+
+
 
 Users.html = async (ctx,next)=>{
     await ctx.render('img',{data:'李若彤'});     //将img.html渲染到index.html 根视图中。

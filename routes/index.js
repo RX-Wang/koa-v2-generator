@@ -7,9 +7,8 @@ const indexController = require('../controller/index');
 const app    = require('../app');
 const io = require('socket.io')(app);
 router.get('/', indexController.index);
+router.get('/registPage',indexController.toRegist);//跳转到注册页面
 router.get('/socket.io',function () {
-
-
     io.on('connection', function (socket) {
         let i = 1;
         setInterval(()=>{

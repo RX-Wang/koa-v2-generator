@@ -1,8 +1,8 @@
 /**
  * Created by wangxuquan on 2017/5/4.
  */
-const send = require('koa-send');
-const path  = require('path');
+const send      = require('koa-send');
+const path      = require('path');
 
 const Index = {};
 

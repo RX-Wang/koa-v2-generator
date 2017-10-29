@@ -17,7 +17,7 @@ function register(e) {
     const name = $('#name').val();
     const pwd = $('#pwd').val();
     $.post('/users/sign-up',{name : name,pwd : pwd},function (data) {
-        if(data.code == '200')
+        if(data.code === '200')
             alert('注册成功');
     });
 }
